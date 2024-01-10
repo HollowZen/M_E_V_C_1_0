@@ -138,9 +138,9 @@ void isNull(Node **head) {
     }else printf("Что-то есть...");
 }
 //Создание списка из массива
-void fromArray(Node **head,int *arr,size_t size) {
-    size_t i = size - 1;
-    if (arr == NULL || size == 0) {
+void fromArray(Node **head,int *arr) {
+    int i=sizeof(arr)-1;
+    if (arr == NULL) {
         return;
     }
     do {
@@ -164,18 +164,28 @@ int* toArray(const Node *head) {
 //Вывод содержимого списка
 void printLinkedList(const Node* head) {
     while (head) {
-        printf("%d",head-> value);
+        printf("%d ",head-> value);
         head=head->next;
     }
     printf("\n");
 }
 //Вывод первого элемента списка
-/*void printFromHead(const Node* head) {
+void printFromHead(const Node* head) {
     if (head) {
         printf("%d ", head->value);
-        printFromHead(head->next);
     }
-}*/
+    printf("\n");
+}
+//Вывод последнего элемента списка
+void printFromEnd(const Node* head) {
+    if (head->next != NULL) {
+        head = head->next;
+        printFromEnd(head);
+    }else {
+        printf("%d ",head->value);
+        printf("\n");
+    }
+}
 
 #pragma endregion
 
@@ -183,7 +193,13 @@ void printLinkedList(const Node* head) {
 int main() {
     //Опусташаем список
     Node *head = NULL;
-    
+    int arr[] = {1,2,3,4,5,6,7,8};
+
+    fromArray(&head,arr);
+
+    printFromHead(head);
+    printLinkedList(head);
+    printFromEnd(head);
 }
 
 
