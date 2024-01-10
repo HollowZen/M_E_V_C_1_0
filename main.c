@@ -91,11 +91,28 @@ void popEnd(Node **head) {
         lastBO->next = NULL;
     }
 }
-//Функция вставки нового значения на n-ное место
-void insert(Node *head, unsigned n, int val) {
+//Функция вставки нового значения на  место предыдущее n-ному значению
+void insertBefore(Node *head, unsigned n, int val) {
     unsigned i = 0;
     Node *tmp = NULL;
-    while (i < n && head ->next) {
+    while (i < n-1 && head ->next) {
+        head = head->next;
+        i++;
+    }
+    tmp = (Node*) malloc(sizeof(Node));
+    tmp ->value = val;
+    if (head->next) {
+        tmp-> next = head->next;
+    }else {
+        tmp ->next = NULL;
+    }
+    head ->next = tmp;
+}
+//Функция вставки нового значения на  место следующее за n-ным значением
+void insertAfter(Node *head, unsigned n, int val) {
+    unsigned i = 0;
+    Node *tmp = NULL;
+    while (i < n-1 && head ->next) {
         head = head->next;
         i++;
     }
@@ -134,12 +151,12 @@ void deleteList(Node **head) {
 void isNull(Node **head) {
     //Проверка head на NULL
     if (head == NULL) {
-        printf("Список Пуст");
-    }else printf("Что-то есть...");
+        printf("List null\n");
+    }else printf("List not null\n");
 }
 //Создание списка из массива
-void fromArray(Node **head,int *arr) {
-    int i=sizeof(arr)-1;
+void fromArray(Node **head,int *arr, int N) {
+    int i= N;
     if (arr == NULL) {
         return;
     }
@@ -148,7 +165,7 @@ void fromArray(Node **head,int *arr) {
     }while (i--!=0);
 }
 //Возвращение массива элементов,хранящихся в строке
-int* toArray(const Node *head) {
+int toArray(const Node *head) {
     int len;
     while(head) {
         len++;
@@ -163,7 +180,7 @@ int* toArray(const Node *head) {
 }
 //Вывод содержимого списка
 void printLinkedList(const Node* head) {
-    while (head) {
+    while (head->next != NULL) {
         printf("%d ",head-> value);
         head=head->next;
     }
@@ -186,21 +203,219 @@ void printFromEnd(const Node* head) {
         printf("\n");
     }
 }
+//Поиск заданного элемента
+void search(const Node* head, int val) {
+    if(head->value == val) {
+        printf("This value is present in the list");
+        printf("%d\n");
+        return;
+    }
+    if(head->next == NULL) {
+        printf("This value is no in the list");
+        printf("%d\n");
+    }else {head= head->next; search(head,val);
+    }}
+//Функция слияния списков
+void merge(Node *a, Node *b, Node **c) {
+    Node tmp;
+    *c = NULL;
+    if (a == NULL) {
+        *c = b;
+        return;
+    }
+    if (b == NULL) {
+        *c = a;
+        return;
+    }
+    if (a->value < b->value) {
+        *c = a;
+        a = a->next;
+    } else {
+        *c = b;
+        b = b->next;
+    }
+    tmp.next = *c;
+    while (a && b) {
+        if (a->value < b->value) {
+            (*c)->next = a;
+            a = a->next;
+        } else {
+            (*c)->next = b;
+            b = b->next;
+        }
+        (*c) = (*c)->next;
+    }
+    if (a) {
+        while (a) {
+            (*c)->next = a;
+            (*c) = (*c)->next;
+            a = a->next;
+        }
+    }
+    if (b) {
+        while (b) {
+            (*c)->next = b;
+            (*c) = (*c)->next;
+            b = b->next;
+        }
+    }
+    *c = tmp.next;
+}
+//Функция разделения списка пополам
+void split(Node *src, Node **low, Node **high) {
+    Node *fast = NULL;
+    Node *slow = NULL;
 
+    if (src == NULL || src->next == NULL) {
+        (*low) = src;
+        (*high) = NULL;
+        return;
+    }
+
+    slow = src;
+    fast = src->next;
+
+    while (fast != NULL) {
+        fast = fast->next;
+        if (fast != NULL) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+    }
+
+    (*low) = src;
+    (*high) = slow->next;
+    slow->next = NULL;
+}
+
+//Функция сортировки методом разделения и слияния списка
+void mergeSort(Node **head) {
+    Node *low  = NULL;
+    Node *high = NULL;
+    if ((*head == NULL) || ((*head)->next == NULL)) {
+        return;
+    }
+    split(*head, &low, &high);
+    mergeSort(&low);
+    mergeSort(&high);
+    merge(low, high, head);
+}
 #pragma endregion
 
 
 int main() {
     //Опусташаем список
     Node *head = NULL;
-    int arr[] = {1,2,3,4,5,6,7,8};
+    //Вызываем меню
+    int val = 0;
+    printf(
+        "\n"
+           "_______________________________________________________"
+           "\n** "
+           "Select one of the options for the program to work **"
+           "\n"
+           "_______________________________________________________"
+           "\n"
+           "\t\t  1   Work with list"
+           "\n"
+           "\t\t  2   Work with stack"
+           "\n"
+           "\t\t  3   Work with queue"
+           "\n"
+           "_______________________________________________________"
+           "\n"
+           );
+    scanf("%d",&val);
+    switch (val) {
+        case 1: {
+            printf(
+                "\n "
+                   "_______________________________________________________"
+                   "\n"
+                   "\t\t  1  Check if the list is empty"
+                   "\n"
+                   "\t\t  2  Creating a list"
+                   "\n"
+                   "\t\t  3  Searching for a list item"
+                   "\n"
+                   "\t\t  4  Adding a list item"
+                   "\n"
+                   "\t\t  5  Removal"
+                   "\n"
+                   "\t\t  6 Take a list item"
+                   "\n"
+                   "\t\t  7 Viewing list items"
+                   "\n"
+           "_______________________________________________________"
+                   "\n"
+                );
+            scanf("%d", &val);
+            switch (val) {
+                case 1: isNull(head); break;;
+                case 2: {
+                    printf(
+               "\n""_______________________________________________________"
+               "\n\t\t  1  Create with sort"
+               "\n\t\t  2  Create not sort"
+               "\n""_______________________________________________________\n");
+                    scanf("%d",&val);
+                    switch (val) {
+                        case 1: {
+                            unsigned i;
+                            unsigned N;
+                            printf("\t\t  How many elements?\n");
+                            scanf("%d",&N);
+                            int array[N];
+                            printf("\t\t  input elements\n");
+                            for(i = 0; i < N; i++ )// заполняем массив
+                            {
+                                printf("[%u]=",i+1);
+                                scanf("%d", array+i);
+                            }
 
-    fromArray(&head,arr);
+                            fromArray(&head,array,N);
+                            mergeSort(&head);
+                            printLinkedList(head);
+                        }
+                        case 2: {
+                            unsigned i;
+                            unsigned N;
+                            printf("\t\t  How many elements?\n");
+                            scanf("%d",&N);
+                            int array[N];
+                            printf("\t\t  input elements\n");
+                            for(i = 0; i < N; i++ )// заполняем массив
+                            {
+                                printf("[%u]=",i+1);
+                                scanf("%d", array+i);
+                            }
 
-    printFromHead(head);
-    printLinkedList(head);
-    printFromEnd(head);
+                            fromArray(&head,array,N);
+                            printLinkedList(head);
+                            break;
+                        }
+                    }
+                    break;
+                };
+                case 3: {
+                    int s;
+                    printf("\t\t  input elements\n");
+                    scanf("%d", s);
+                    search(head,s);
+                    break;
+                }
+                case 4: break;
+                case 5: break;
+                case 6: break;
+                case 7: break;
+            }
+            break;
+        }
+        case 2: printf("stack");break;
+        case 3: printf("queue");break;
+    }
 }
+
 
 
 
