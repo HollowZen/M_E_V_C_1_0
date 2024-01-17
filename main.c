@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #pragma region Реализация списка и работа с ним
 //Структура узла
@@ -38,7 +39,6 @@ int pop(Node **head) {
     free(prev);
     return val;
 }
-
 //Возврат указателя на n-ный элемент
 Node* getNth(Node* head,int n) {
     //Счетчик
@@ -148,21 +148,21 @@ void deleteList(Node **head) {
     free(*head);
 }
 //Проверка на пустоту
-void isNull(Node **head) {
+void isNull(Node* head) {
     //Проверка head на NULL
-    if (head == NULL) {
+    if (head->value == 0) {
         printf("List null\n");
-    }else printf("List not null\n");
+    }else {printf("List not null\n");}
 }
 //Создание списка из массива
-void fromArray(Node **head,int *arr, int N) {
-    int i= N;
-    if (arr == NULL) {
+void fromArray(Node **head,int *arr,size_t size) {
+    size_t i = size - 1;
+    if (arr == NULL || size == 0) {
         return;
     }
     do {
-        push(head,arr[i]);
-    }while (i--!=0);
+        push(head, arr[i]);
+    } while(i--!=0);
 }
 //Возвращение массива элементов,хранящихся в строке
 int toArray(const Node *head) {
@@ -178,10 +178,47 @@ int toArray(const Node *head) {
     }
     return values;
 }
+//Функция вычисления размера массива чисел
+int lenIntMass(char* S) {
+    int i,l,k,len = 0;
+    char q;
+    l=strlen(S);
+    for (i=0; i<l; i++){
+        q=S[i];
+        if (q==','){
+            if (k>0) {
+                len++;
+            }}
+        else{k++;}
+    }
+    return len;
+}
+//Функция из строки в массив чисел
+void strToArr(char* S, int* arr, int len)
+{
+    int c,i,j,l,k;
+    char q;
+
+    l=strlen(S);
+    c=0;
+    k=0;
+    j=0;
+
+    for (i=0; i<l; i++){
+        q=S[i];
+        if (q==','){
+            if (k>0) {
+                arr[j]=c;
+                c=0; k=0;
+                j++;
+            }}
+        else{k++;c=c*10+(q-'0');}
+    }
+}
 //Вывод содержимого списка
 void printLinkedList(const Node* head) {
-    while (head->next != NULL) {
-        printf("%d ",head-> value);
+    while (head != NULL) {
+        printf("%d ",head->value);
         head=head->next;
     }
     printf("\n");
@@ -205,108 +242,73 @@ void printFromEnd(const Node* head) {
 }
 //Поиск заданного элемента
 void search(const Node* head, int val) {
+
+    if(head->value == 0) {
+        printf("This value is no in the list");
+        printf("%d\n");
+        return;
+    }
     if(head->value == val) {
         printf("This value is present in the list");
         printf("%d\n");
         return;
-    }
-    if(head->next == NULL) {
-        printf("This value is no in the list");
-        printf("%d\n");
     }else {head= head->next; search(head,val);
-    }}
-//Функция слияния списков
-void merge(Node *a, Node *b, Node **c) {
-    Node tmp;
-    *c = NULL;
-    if (a == NULL) {
-        *c = b;
-        return;
     }
-    if (b == NULL) {
-        *c = a;
-        return;
-    }
-    if (a->value < b->value) {
-        *c = a;
-        a = a->next;
-    } else {
-        *c = b;
-        b = b->next;
-    }
-    tmp.next = *c;
-    while (a && b) {
-        if (a->value < b->value) {
-            (*c)->next = a;
-            a = a->next;
-        } else {
-            (*c)->next = b;
-            b = b->next;
-        }
-        (*c) = (*c)->next;
-    }
-    if (a) {
-        while (a) {
-            (*c)->next = a;
-            (*c) = (*c)->next;
-            a = a->next;
-        }
-    }
-    if (b) {
-        while (b) {
-            (*c)->next = b;
-            (*c) = (*c)->next;
-            b = b->next;
-        }
-    }
-    *c = tmp.next;
-}
-//Функция разделения списка пополам
-void split(Node *src, Node **low, Node **high) {
-    Node *fast = NULL;
-    Node *slow = NULL;
-
-    if (src == NULL || src->next == NULL) {
-        (*low) = src;
-        (*high) = NULL;
-        return;
-    }
-
-    slow = src;
-    fast = src->next;
-
-    while (fast != NULL) {
-        fast = fast->next;
-        if (fast != NULL) {
-            fast = fast->next;
-            slow = slow->next;
-        }
-    }
-
-    (*low) = src;
-    (*high) = slow->next;
-    slow->next = NULL;
 }
 
-//Функция сортировки методом разделения и слияния списка
-void mergeSort(Node **head) {
-    Node *low  = NULL;
-    Node *high = NULL;
-    if ((*head == NULL) || ((*head)->next == NULL)) {
-        return;
-    }
-    split(*head, &low, &high);
-    mergeSort(&low);
-    mergeSort(&high);
-    merge(low, high, head);
+struct Node* swap(struct Node* ptr1, struct Node* ptr2)
+{
+    struct Node* tmp = ptr2->next;
+    ptr2->next = ptr1;
+    ptr1->next = tmp;
+    return ptr2;
 }
+void bubbleSort(struct Node** head, int count)
+{
+    if (head == NULL){return;}
+    struct Node** h;
+    int i, j, swapped;
+
+    for (i = 0; i <= count; i++) {
+
+        h = head;
+        swapped = 0;
+
+        for (j = 0; j < count - i - 1; j++) {
+
+            struct Node* p1 = *h;
+            struct Node* p2 = p1->next;
+
+            if (p1->value > p2->value) {
+                *h = swap(p1, p2);
+                swapped = 1;
+            }
+
+            h = &(*h)->next;
+        }
+
+        if (swapped == 0)
+            break;
+    }
+}
+
+
+
 #pragma endregion
+#pragma region Меню
 
+
+void menuList(Node *head,int val){
+    }
+
+
+
+#pragma endregion
 
 int main() {
     //Опусташаем список
     Node *head = NULL;
-    //Вызываем меню
+
     int val = 0;
     printf(
         "\n"
@@ -351,66 +353,61 @@ int main() {
                 );
             scanf("%d", &val);
             switch (val) {
-                case 1: isNull(head); break;;
+                case 1: isNull(&head); break;;
                 case 2: {
                     printf(
-               "\n""_______________________________________________________"
+               "\n_______________________________________________________"
                "\n\t\t  1  Create with sort"
                "\n\t\t  2  Create not sort"
-               "\n""_______________________________________________________\n");
+               "\n_______________________________________________________\n");
                     scanf("%d",&val);
                     switch (val) {
                         case 1: {
-                            unsigned i;
-                            unsigned N;
-                            printf("\t\t  How many elements?\n");
-                            scanf("%d",&N);
-                            int array[N];
-                            printf("\t\t  input elements\n");
-                            for(i = 0; i < N; i++ )// заполняем массив
-                            {
-                                printf("[%u]=",i+1);
-                                scanf("%d", array+i);
-                            }
+                            char str[1024];
 
-                            fromArray(&head,array,N);
-                            mergeSort(&head);
-                            printLinkedList(head);
+                            printf("\t\t  input elements through (,)\n");
+                            getchar();
+                            fgets(&str,1024,stdin);
+                            head = NULL;
+                            int len = lenIntMass(&str);
+                            int array[len];
+                            strToArr(&str,&array,len);
+                            fromArray(&head,array,len);
+                            bubbleSort(&head,len);
+                            printLinkedList(&head);
+                            break;;
                         }
                         case 2: {
-                            unsigned i;
-                            unsigned N;
-                            printf("\t\t  How many elements?\n");
-                            scanf("%d",&N);
-                            int array[N];
-                            printf("\t\t  input elements\n");
-                            for(i = 0; i < N; i++ )// заполняем массив
-                            {
-                                printf("[%u]=",i+1);
-                                scanf("%d", array+i);
-                            }
+                            char str[1024];
 
-                            fromArray(&head,array,N);
+                            printf("\t\t  input elements through (,)\n");
+                            getchar();
+                            fgets(&str,1024,stdin);
+                            head = NULL;
+                            int len = lenIntMass(&str);
+                            int array[len];
+                            strToArr(&str,&array,len);
+                            fromArray(&head,array,len);
                             printLinkedList(head);
-                            break;
+                            break;;
                         }
                     }
                     break;
                 };
                 case 3: {
-                    int s;
+                    char s[10];
+                    int a = 0;
                     printf("\t\t  input elements\n");
-                    scanf("%d", s);
-                    search(head,s);
-                    break;
+                    getchar();
+                    fgets(s,10,stdin);
+                    a = strtol(s,NULL,10);
+                    search(&head,a);
                 }
                 case 4: break;
                 case 5: break;
                 case 6: break;
                 case 7: break;
-            }
-            break;
-        }
+            }}
         case 2: printf("stack");break;
         case 3: printf("queue");break;
     }
