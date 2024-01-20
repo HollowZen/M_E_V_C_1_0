@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #pragma region Реализация списка и работа с ним
 //Структура узла
@@ -66,6 +67,36 @@ void pushEnd(Node *head, int value) {
     tmp->next=NULL;
     last->next=tmp;
 }
+//Удалить и вывести последний элемент
+int popEnd(Node **head) {
+    int val = 0;
+    Node *pFwd = NULL;  //текущий узел
+    Node *pBwd = NULL;  //предыдущий узел
+    //Получили NULL
+    if (!head) {
+        exit(-1);
+    }
+    //Список пуст
+    if (!(*head)) {
+        exit(-1);
+    }
+
+    pFwd = *head;
+    while (pFwd->next) {
+        pBwd = pFwd;
+        pFwd = pFwd->next;
+    }
+
+    if (pBwd == NULL) {
+        free(*head);
+        *head = NULL;
+    } else {
+        val = pFwd->value;
+        free(pFwd->next);
+        pBwd->next = NULL;
+    }
+    return val;
+}
 //Возвращение указатель предпоследнего элемента списка
 Node* getLastButOne(Node* head) {
     if (head == NULL) exit(-2);
@@ -78,7 +109,7 @@ Node* getLastButOne(Node* head) {
     return head;
 }
 //Функция удаления последнего элемента списка
-void popEnd(Node **head) {
+void deleteEnd(Node **head) {
     Node *lastBO = NULL;
     if (!head) exit(-1);
     if (!(*head)) exit(-1);
@@ -112,7 +143,7 @@ void insertBefore(Node *head, unsigned n, int val) {
 void insertAfter(Node *head, unsigned n, int val) {
     unsigned i = 0;
     Node *tmp = NULL;
-    while (i < n-1 && head ->next) {
+    while (i < n && head ->next) {
         head = head->next;
         i++;
     }
@@ -125,32 +156,59 @@ void insertAfter(Node *head, unsigned n, int val) {
     }
     head ->next = tmp;
 }
+//Функция удаление первого элемента
+void deleteStart(Node **head) {
+    //Локальная переменная с адресом первого элемента
+    Node* prev = NULL;
+    //Проверка head на NULL
+    if (head == NULL) exit(-1);
+    //Указатель на первый элемент в списке
+    prev = (*head);
+    //перенос указателя head на след.элемент
+    (*head) = (*head) -> next;
+    //Удаление первого элемента списка
+    free(prev);
+}
 //Функция удаления n-ного элемента списка
-int deleteNth(Node **head, unsigned n) {
-    if (n==0) {
-        return pop(head);
-    }else {
-        Node *prev = getNth(*head,n-1);
-        Node *elm = prev->next;
-        int val = elm -> next;
+void deleteNth(Node **head, unsigned n) {
+    if (n == 0) {
+         pop(head);
+    } else {
+        Node *prev = getNth(*head, n-1);
+        Node *elm  = prev->next;
+        prev->next = elm->next;
+        free(elm);
+    }
+}
+//Возврат и  удаления n-ного элемента списка
+int popNth(Node **head, unsigned n) {
+    int val = 0;
+    if (n == 0) {
+        val = (*head)->value;
+        pop(head);
+        return val;
+    } else {
+        Node *prev = getNth(*head, n-1);
+        Node *elm  = prev->next;
+        prev->next = elm->next;
+        val = elm->value;
         free(elm);
         return val;
     }
 }
 //Удаление всего списка
 void deleteList(Node **head) {
-    Node* prev = NULL;
     while ((*head)->next) {
-        prev = (*head);
-        (*head) = (*head)->next;
-        free(prev);
+        pop(head);
+        *head = (*head)->next;
     }
-    free(*head);
+
+    pop(head);
 }
 //Проверка на пустоту
 void isNull(Node* head) {
     //Проверка head на NULL
-    if (head->value == 0) {
+    if (head == 0) {
         printf("List null\n");
     }else {printf("List not null\n");}
 }
@@ -216,22 +274,22 @@ void strToArr(char* S, int* arr, int len)
     }
 }
 //Вывод содержимого списка
-void printLinkedList(const Node* head) {
-    while (head != NULL) {
+void printLinkedList(Node *head) {
+    while (head != 0) {
         printf("%d ",head->value);
         head=head->next;
     }
     printf("\n");
 }
 //Вывод первого элемента списка
-void printFromHead(const Node* head) {
+void printFromHead(Node *head) {
     if (head) {
         printf("%d ", head->value);
     }
     printf("\n");
 }
 //Вывод последнего элемента списка
-void printFromEnd(const Node* head) {
+void printFromEnd(Node *head) {
     if (head->next != NULL) {
         head = head->next;
         printFromEnd(head);
@@ -241,21 +299,21 @@ void printFromEnd(const Node* head) {
     }
 }
 //Поиск заданного элемента
-void search(const Node* head, int val) {
+void search(Node* head, int val) {
 
-    if(head->value == 0) {
+    if(head == 0 || (head->value == 0 && head->next == 0)) {
         printf("This value is no in the list");
-        printf("%d\n");
+        printf("\n");
         return;
     }
     if(head->value == val) {
         printf("This value is present in the list");
-        printf("%d\n");
+        printf("\n");
         return;
     }else {head= head->next; search(head,val);
     }
 }
-
+//Пузырьковая сортировка
 struct Node* swap(struct Node* ptr1, struct Node* ptr2)
 {
     struct Node* tmp = ptr2->next;
@@ -292,6 +350,84 @@ void bubbleSort(struct Node** head, int count)
     }
 }
 
+//Реверс элементов между первым и последним вхождение элемента E
+Node* reverseBetweenFirstAndLast(Node* head, int e) {
+    if (!head)return;;
+    Node* curr = head;
+    Node* first = NULL;
+    Node* last = NULL;
+    Node* reverst = NULL;
+    Node* answ = NULL;
+
+    int i = 0;
+
+    while (curr) {
+        if (curr->value == e) {
+            i++;
+        }
+        curr = curr->next;
+    }
+    curr = head;
+    if (i<2){printf("Count e in list < 2"); return -1;}
+
+    // Находим первое и последнее вхождение элемента E
+    while (curr) {
+        if (curr->value == e) {
+            if (first == NULL){first = curr;}
+            last = curr;
+        }
+        curr = curr->next;
+    }
+    Node* tmpLast = last;
+    //Реверс конца списка
+    while (last) {
+        Node* tmp = last->next;
+        last->next = reverst;
+        reverst = last;
+        last = tmp;
+    }
+    last = tmpLast;
+    //Внесение элементов от последнего вхождения Е
+    while (reverst) {
+        Node* tmp = reverst->next;
+        reverst->next = answ;
+        answ = reverst;
+        reverst = tmp;
+    }
+    Node* tmpFirst = first;
+    first = first->next;
+    //Внесение реверсированных элементов между первым и последними вхождение Е
+    while (first != last) {
+        Node* tmp = first->next;
+        first->next = answ;
+        answ = first;
+        first = tmp;
+    }
+    first = tmpFirst->next;
+    //Реверс элементов до первого вхождения Е
+    while(head != first) {
+        Node* tmp = head->next;
+        head->next = reverst;
+        reverst = head;
+        head = tmp;
+    }
+    while (reverst) {
+        Node* tmp = reverst->next;
+        reverst->next = answ;
+        answ = reverst;
+        reverst = tmp;
+    }
+
+
+
+
+
+    return answ;
+
+
+}
+
+
 
 
 #pragma endregion
@@ -299,6 +435,287 @@ void bubbleSort(struct Node** head, int count)
 
 
 void menuList(Node *head,int val){
+    printf(
+                "\n "
+                   "_______________________________________________________"
+                   "\n"
+                   "\t\t  1  Check if the list is empty"
+                   "\n"
+                   "\t\t  2  Creating a list"
+                   "\n"
+                   "\t\t  3  Searching for a list item"
+                   "\n"
+                   "\t\t  4  Adding a list item"
+                   "\n"
+                   "\t\t  5  Removal"
+                   "\n"
+                   "\t\t  6 Take a list item"
+                   "\n"
+                   "\t\t  7 Viewing list items"
+                   "\n"
+                   "\t\t  8 Reverse list on first E to last E"
+                   "\n"
+           "_______________________________________________________"
+                   "\n"
+                );
+    scanf("%d", &val);
+    switch (val) {
+        case 1: {
+            isNull(head);
+            break;
+        }
+        case 2: {
+                    printf(
+               "\n_______________________________________________________"
+               "\n\t\t  1  Create with sort"
+               "\n\t\t  2  Create not sort"
+               "\n_______________________________________________________\n");
+                    scanf("%d",&val);
+                    switch (val) {
+                        case 1: {
+                            char str[1024];
+                            printf("\t\t  input elements through (,)\n");
+                            getchar();
+                            fgets(&str,1024,stdin);
+                            head = NULL;
+                            int len = lenIntMass(&str);
+                            int array[len];
+                            strToArr(&str,&array,len);
+                            fromArray(&head,array,len);
+                            bubbleSort(&head,len);
+                            Node *tmp = head;
+                            printLinkedList(head);
+                            head = tmp;
+                            break;;
+                        }
+                        case 2: {
+
+                            char str[1024];
+                            printf("\t\t  input elements through (,)\n");
+                            getchar();
+                            fgets(&str,1024,stdin);
+                            head = NULL;
+                            int len = lenIntMass(&str);
+                            int array[len];
+                            strToArr(&str,&array,len);
+                            fromArray(&head,array,len);
+                            printLinkedList(head);
+                            break;;
+                        }
+                    }
+                    break;
+                }
+        case 3: {
+                    char s[10];
+                    int a = 0;
+                    printf("\t\t  input elements\n");
+                    getchar();
+                    fgets(s,10,stdin);
+                    a = strtol(s,NULL,10);
+                    search(head,a);
+                    break;
+                }
+        case 4: {
+                    char value[10];
+                    printf("Which element is being inserted?\n");
+                    getchar();
+                    fgets(value,10,stdin);
+                    printf(
+                "\n "
+                   "_______________________________________________________"
+                   "\n"
+                   "\t\t  1  Add element before n-th element"
+                   "\n"
+                   "\t\t  2  Add element after n-th element"
+                   "\n"
+                   "\t\t  3  Add element to start"
+                   "\n"
+                   "\t\t  4  Add element to end"
+                   "\n"
+
+           "_______________________________________________________"
+                   "\n"
+                );
+                    scanf("%d", &val);
+                    getchar();
+                    switch (val) {
+                        case 1:{
+                            int valueNth;
+                            printf("Before which element?\n");
+                            scanf("%d", &valueNth);
+                            int n = 0;
+                            Node* tmp = head;
+                            while (head != 0 && head->value != valueNth) {
+                                    n++;
+                                head = head->next;
+                            }
+                            head = tmp;
+
+
+
+                            insertBefore(head,n,strtol(value,NULL,10));
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 2: {
+                            int valueNth;
+                            printf("After which element?\n");
+                            scanf("%d", &valueNth);
+                            int n = 0;
+                            Node* tmp = head;
+                            while (head != 0 && head->value != valueNth) {
+                                n++;
+                                head = head->next;
+                            }
+                            head = tmp;
+
+
+
+                            insertAfter(head,n,strtol(value,NULL,10));
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 3: {
+                            push(head,strtol(value,NULL,10));
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 4: {
+                            pushEnd(head,value);
+                            printLinkedList(head);
+                            break;
+                        }
+                    }
+                    break;
+                }
+        case 5: {
+                    printf(
+                "\n "
+                   "_______________________________________________________"
+                   "\n"
+                   "\t\t  1  Delete start element"
+                   "\n"
+                   "\t\t  2  Delete end element"
+                   "\n"
+                   "\t\t  3  Delete N-th element"
+                   "\n"
+                   "\t\t  4  Delete all list"
+                   "\n"
+           "_______________________________________________________"
+                   "\n"
+                );
+                    scanf("%d", &val);
+                    switch (val) {
+                        case 1: {
+                            deleteStart(&head);
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 2: {
+                            deleteEnd(&head);
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 3: {
+                            int valueNth;
+                            printf("Which element delete?\n");
+                            scanf("%d", &valueNth);
+                            getchar();
+                            int n = 0;
+                            Node* tmp = head;
+                            while (head != 0 && head->value != valueNth) {
+                                n++;
+                                head = head->next;
+                            }
+                            head = tmp;
+                            deleteNth(&head,n);
+                            printLinkedList(head);
+                            break;
+                        }
+                        case 4: {
+                            deleteList(&head);
+                            printLinkedList(head);
+                            break;
+                        }
+                    }
+                    break;
+                }
+        case 6: {
+                    printf(
+            "\n "
+               "_______________________________________________________"
+               "\n"
+               "\t\t  1  Output first element"
+               "\n"
+               "\t\t  2  Output last element"
+               "\n"
+               "\t\t  3  Output N-th element"
+               "\n"
+       "_______________________________________________________"
+               "\n"
+            );
+                    scanf("%d", &val);
+                    switch (val) {
+                        case 1: {
+                            printf("%d", pop(&head));
+                            break;
+                        }
+                        case 2: {
+                            printf("%d",popEnd(&head));
+                            break;
+                        }
+                        case 3: {
+                            int valueNth;
+                            printf("Which element output?\n");
+                            scanf("%d", &valueNth);
+                            getchar();
+                            int n = 0;
+                            Node* tmp = head;
+                            while (head != 0 && head->value != valueNth) {
+                                n++;
+                                head = head->next;
+                            }
+                            head = tmp;
+                            printf("%d",popNth(&head,n));
+                            break;
+                        }
+                    }
+                    break;
+                }
+        case 7: {
+                    printf(
+   "\n "
+      "_______________________________________________________"
+      "\n"
+      "\t\t  1  Print first"
+      "\n"
+      "\t\t  2  Print last"
+      "\n"
+      "\t\t  3  Print all"
+      "\n"
+"_______________________________________________________"
+      "\n"
+   );
+                    scanf("%d", &val);
+                    switch (val) {
+                        case 1:{Node *tmp = head;printFromHead(head);head=tmp;;break;}
+                        case 2:{Node *tmp = head;printFromEnd(head);head=tmp;;break;}
+                        case 3:{Node *tmp = head;printLinkedList(head);head=tmp;;break;}
+                    }
+                    break;
+                }
+        case 8: {
+                    int value;
+                    printf("Insert E\n");
+                    scanf("%d", &value);
+                    getchar();
+                    head = reverseBetweenFirstAndLast(head,value);
+                    break;
+        }
+        default:break;
+            }
+    val = 0;
+    menuList(head,val);
     }
 
 
@@ -330,84 +747,8 @@ int main() {
     scanf("%d",&val);
     switch (val) {
         case 1: {
-            printf(
-                "\n "
-                   "_______________________________________________________"
-                   "\n"
-                   "\t\t  1  Check if the list is empty"
-                   "\n"
-                   "\t\t  2  Creating a list"
-                   "\n"
-                   "\t\t  3  Searching for a list item"
-                   "\n"
-                   "\t\t  4  Adding a list item"
-                   "\n"
-                   "\t\t  5  Removal"
-                   "\n"
-                   "\t\t  6 Take a list item"
-                   "\n"
-                   "\t\t  7 Viewing list items"
-                   "\n"
-           "_______________________________________________________"
-                   "\n"
-                );
-            scanf("%d", &val);
-            switch (val) {
-                case 1: isNull(&head); break;;
-                case 2: {
-                    printf(
-               "\n_______________________________________________________"
-               "\n\t\t  1  Create with sort"
-               "\n\t\t  2  Create not sort"
-               "\n_______________________________________________________\n");
-                    scanf("%d",&val);
-                    switch (val) {
-                        case 1: {
-                            char str[1024];
-
-                            printf("\t\t  input elements through (,)\n");
-                            getchar();
-                            fgets(&str,1024,stdin);
-                            head = NULL;
-                            int len = lenIntMass(&str);
-                            int array[len];
-                            strToArr(&str,&array,len);
-                            fromArray(&head,array,len);
-                            bubbleSort(&head,len);
-                            printLinkedList(&head);
-                            break;;
-                        }
-                        case 2: {
-                            char str[1024];
-
-                            printf("\t\t  input elements through (,)\n");
-                            getchar();
-                            fgets(&str,1024,stdin);
-                            head = NULL;
-                            int len = lenIntMass(&str);
-                            int array[len];
-                            strToArr(&str,&array,len);
-                            fromArray(&head,array,len);
-                            printLinkedList(head);
-                            break;;
-                        }
-                    }
-                    break;
-                };
-                case 3: {
-                    char s[10];
-                    int a = 0;
-                    printf("\t\t  input elements\n");
-                    getchar();
-                    fgets(s,10,stdin);
-                    a = strtol(s,NULL,10);
-                    search(&head,a);
-                }
-                case 4: break;
-                case 5: break;
-                case 6: break;
-                case 7: break;
-            }}
+            menuList(head,val);
+            }
         case 2: printf("stack");break;
         case 3: printf("queue");break;
     }
