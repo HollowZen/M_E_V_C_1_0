@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #pragma region Реализация списка и работа с ним
 //Структура узла
@@ -604,6 +605,181 @@ int countElementsWithSameNeighbours(Queue* queue) {
 }
 #pragma endregion
 
+#pragma region Реализация стека и работа с ним
+//Структура стека
+typedef struct Stack
+{
+    int size;
+    Node *top;
+}Stack;
+//Инициализация стека
+void stack_Init(Stack **stack) {
+    Stack *new_stack = NULL;
+    if((new_stack = (Stack*)malloc(sizeof(Stack))) == NULL)
+    {
+        return;
+    }
+    new_stack->top = NULL;
+    new_stack->size = 0;
+    (*stack) = new_stack;
+}
+//Вывести из стека
+int stack_Pop(Stack* stack,int* value) {
+    if(stack->top == NULL)
+    {
+        return -1;
+    }
+    if (stack->size != 0) {
+        stack->size--;
+        *value = stack->top->value;
+        stack->top = stack->top->next;
+        return *value;
+    }else {
+        printf("Stack UNDERFLOW");
+        return -1;
+    }
+}
+//Внести в стек
+void stack_Push(Stack* stack,int value) {
+    Node *newElmt = NULL;
+    if(stack == NULL || (newElmt = (Node*)malloc(sizeof(Node))) == NULL)
+    {
+        return;
+    }
+    if (stack->size != 20) {
+        newElmt->value = value;
+        newElmt->next = stack->top;
+        stack->size++;
+        stack->top = newElmt;
+    }else {
+        printf("Stack OVERFLOW\n");
+    }
+
+}
+//Уничтожить стек
+int stack_Destory(Stack **stack) {
+    int count = 0;
+    int value;
+    if(*stack == NULL)
+    {
+        return -1;
+    }
+    count = (*stack)->size;
+    while((*stack)->size > 0)
+    {
+        stack_Pop(*stack,&value);
+    }
+    free(*stack);
+    *stack = NULL;
+    return count;
+}
+//Проверка стека на пустоту
+void isEmptyStack(Stack* stack) {
+    if (stack->top == NULL) {
+        printf("Stack is NULL");
+    }else {
+        printf("Stack is not NULL");
+    }
+}
+//Формирование стека
+void createStack(Stack* stack,int value) {
+    stack_Push(stack,value);
+}
+//Поиск элемента в стеке
+void searchElmStack(Stack* stack,int value) {
+    Node* tmp = NULL; ;
+    for (tmp = stack->top;tmp != NULL;tmp = tmp->next) {
+        if (tmp->value == value) {
+            printf("This element is present in stack");
+            return;
+        }
+        if (tmp == NULL) {
+            printf("This element is not present in stack");
+        }
+    }
+
+}
+//Посмотреть и удалить элемент
+int PopElmStack(Stack *stack,int value) {
+    Node *curr,*prev;
+    int x;
+    if(stack->top == NULL) {
+        printf("Stack is NULL!\n");
+        return 0;
+    }
+    for(curr = stack->top; curr!= NULL; curr=curr->next) {
+
+        if (curr->value != value) {
+            prev = curr;
+        }else {
+            if (curr == stack->top) {
+                prev = curr;
+                (*curr) = (*prev->next);return curr->value;
+            }else {
+                if (curr->next != NULL) {
+                    prev->next = curr->next;
+                    return curr->value;
+                }else {
+                    prev->next = NULL;
+                    (*curr) = (*prev);
+                    return curr->value;
+                }
+            }
+
+        }
+
+    }
+}
+//Посмотреть и удалить элемент
+void PopAllStack(Stack *stack) {
+    int value = 0;
+    while (stack_Pop(stack,&value) != -1)
+    printf("%d ",value);
+}
+//Удалить элемент
+void deleteElmStack(Stack* stack,int value) {
+    Node *curr,*prev;
+    if(stack->top == NULL) {
+        printf("Stack is NULL!\n");
+        return;
+    }
+    for(curr = stack->top; curr!= NULL; curr=curr->next) {
+
+        if (curr->value != value) {
+            prev = curr;
+        }else {
+            if (curr == stack->top) {
+                prev = curr;
+                (*curr) = (*prev->next);return;
+            }else {
+                if (curr->next != NULL) {
+                    prev->next = curr->next;
+                    return;
+                }else {
+                    prev->next = NULL;
+                    (*curr) = (*prev);
+                    return;
+                }
+            }
+
+        }
+
+    }
+}
+//Вывети вершину стека
+void printTopStack(Stack* stack) {
+    printf("%d ",stack->top->value);
+}
+//Вывети вершину стека
+void printAllStack(Stack* stack) {
+    Node* tmp = NULL; ;
+    for (tmp = stack->top;tmp != NULL;tmp = tmp->next) {
+        printf("%d " , tmp->value);
+    }
+}
+
+#pragma endregion
+
 #pragma region Меню
 
 void menuList(Node *head,int val){
@@ -887,6 +1063,7 @@ void menuList(Node *head,int val){
                     break;
         }
         case 9: {
+            free(head);
             return;
         }
         default: {
@@ -1021,7 +1198,7 @@ void menuQueue(Node *head,Queue *q, int val) {
                     getchar();
                     scanf("%s",str);
                     value = strtol(str,NULL,10);
-                    popQueueNth(q,value);
+                    printf("%d",popQueueNth(q,value));
                     break;
                 }
                 case 2: {
@@ -1040,7 +1217,7 @@ void menuQueue(Node *head,Queue *q, int val) {
                        "\n"
                        "\t\t  2  Print Rear"
                        "\n"
-                       "\t\t  2  Print all"
+                       "\t\t  3  Print all"
                        "\n"
                "_______________________________________________________"
                        "\n"
@@ -1067,14 +1244,196 @@ void menuQueue(Node *head,Queue *q, int val) {
             printf("%d",countElementsWithSameNeighbours(q));
             break;
         }
-        case 9:{break;}
+        case 9: {
+            free(q);
+            return;;
+        }
         default:{exit(-1);}
     }
 
     menuQueue(head,q,val);
 }
 
-void grandMenu(Node *head,Queue *q) {
+void menuStack(Node *head,Stack *stack, int val) {
+    printf(
+    "\n "
+           "_______________________________________________________"
+           "\n"
+           "\t\t  1  Check if the stack is empty"
+           "\n"
+           "\t\t  2  Creating a stack"
+           "\n"
+           "\t\t  3  Searching for a stack item"
+           "\n"
+           "\t\t  4  Adding a stack item"
+           "\n"
+           "\t\t  5  Deleting"
+           "\n"
+           "\t\t  6  Take a stack item"
+           "\n"
+           "\t\t  7  Viewing stack items"
+           "\n"
+           "\t\t  9  Exit in grand menu"
+           "\n"
+   "_______________________________________________________"
+           "\n"
+               );
+    scanf("%d",&val);
+    switch (val) {
+        case 1: {
+            isEmptyStack(stack);
+            break;
+        }
+        case 2: {
+            char str[1024];
+
+            printf("\t\t  input elements through (,)\n");
+            getchar();
+            fgets(&str,1024,stdin);
+
+            int len = lenIntMass(&str);
+            int array[len];
+
+            strToArr(&str,&array);
+            for (int i = 0;i < len;i++) {
+                createStack(stack,array[i]);
+                if (i > 20) {
+                    printf("Stack OVERFLOW\n");
+                    return;
+                }
+            }
+            break;
+        }
+        case 3: {
+            int value = 0;
+            char str[10];
+            printf("Insert value is search in stack\n");
+            scanf("%s",str);
+            value = strtol(str,NULL,10);
+            searchElmStack(stack,value);
+            break;
+        }
+        case 4: {
+
+            char str[10];
+            printf("Insert adding value\n");
+            int newValue = 0;
+
+            getchar();
+            scanf("%s",&str);
+            newValue = strtol(str,NULL,10);
+            if (stack->size == 20) {
+
+                printf("Stack OVERFLOW\n");
+                break;
+            }else {
+                stack_Push(stack,newValue);
+                printAllStack(stack);
+            }
+            break;
+        }
+        case 5: {
+            printf(
+                "\n "
+                       "_______________________________________________________"
+                       "\n"
+                       "\t\t  1  Delete element stack"
+                       "\n"
+                       "\t\t  2  Delete all stack"
+                       "\n"
+               "_______________________________________________________"
+                       "\n"
+                           );
+            scanf("%d",&val);
+            switch (val) {
+                case 1: {
+                    int value = 0;
+                    char str[10];
+                    printf("Insert delete value\n");
+                    getchar();
+                    scanf("%s",str);
+                    value = strtol(str,NULL,10);
+                    deleteElmStack(stack,value);
+                    break;
+                }
+                case 2:{
+                    printf("Count delete element: %d\n",stack_Destory(&stack));
+                    stack_Init(&stack);
+                    break;
+                }
+            }
+            break;
+        }
+        case 6: { printf(
+                "\n "
+                       "_______________________________________________________"
+                       "\n"
+                       "\t\t  1  Output element stack"
+                       "\n"
+                       "\t\t  2  Output all stack"
+                       "\n"
+               "_______________________________________________________"
+                       "\n"
+                           );
+            scanf("%d",&val);
+            switch (val) {
+                case 1: {
+                    int value = 0;
+                    char str[10];
+                    printf("Insert value for output\n");
+                    getchar();
+                    scanf("%s",str);
+                    value = strtol(str,NULL,10);
+                    PopElmStack(stack,value);
+
+                    printf("%d",PopElmStack(stack,value));
+                    break;
+                }
+                case 2: {
+                    while (stack->top != NULL) {
+                        PopAllStack(stack);
+                    };break;
+                }
+            }
+
+        }
+        case 7: {
+            printf(
+           "\n "
+                  "_______________________________________________________"
+                  "\n"
+                  "\t\t  1  Print Top"
+                  "\n"
+                  "\t\t  2  Print all"
+                  "\n"
+          "_______________________________________________________"
+                  "\n"
+                      );
+            scanf("%d",&val);
+            switch (val) {
+                case 1: {
+                    printTopStack(stack);
+                    break;
+                }
+                case 2: {
+                    printAllStack(stack);
+                    break;
+
+                }
+
+                break;
+            }
+            case 9: {
+                free(stack);
+                return;;
+            }
+            default:{exit(-1);}
+
+        }
+    } menuStack(head,stack,val);
+}
+
+void grandMenu(Node *head,Queue *q,Stack* stack) {
     int val = 0;
     printf(
         "\n"
@@ -1099,11 +1458,11 @@ void grandMenu(Node *head,Queue *q) {
     switch (val) {
         case 1: {menuList(head,val);break;}
         case 2: {menuQueue(head,q,val);break;}
-        case 3: printf("stack");break;
+        case 3: {menuStack(head,stack,val);break;};
         case 9: {exit(0);}
         default:{exit(-1);}
     }
-    grandMenu(head,q);
+    grandMenu(head,q,stack);
 }
 
 #pragma endregion
@@ -1112,7 +1471,9 @@ int main() {
     //Опусташаем список
     Node *head = NULL;
     Queue *q = init();
-    grandMenu(head,q);
+    Stack* stack;
+    stack_Init(&stack);
+    grandMenu(head,q,stack);
 }
 
 
