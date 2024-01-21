@@ -43,7 +43,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "Debug"
+			"value" : "Release"
 		},
 		{
 			"name" : "CMAKE_CACHEFILE_DIR",
@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-debug"
+			"value" : "c:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-release"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -431,7 +431,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-release/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -543,7 +543,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/Users/egmal/AppData/Local/Programs/CLIONN~1/bin/ninja/win/x64/ninja.exe"
+			"value" : "C:/Users/egmal/AppData/Local/Programs/CLion Nova/bin/ninja/win/x64/ninja.exe"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -1135,7 +1135,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-debug"
+			"value" : "C:/Users/egmal/CLionProjects/M.E.V C 1.0/cmake-build-release"
 		},
 		{
 			"name" : "M_E_V_C_1_0_IS_TOP_LEVEL",

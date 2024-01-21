@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #pragma region Реализация списка и работа с ним
 //Структура узла
@@ -252,7 +251,7 @@ int lenIntMass(char* S) {
     return len;
 }
 //Функция из строки в массив чисел
-void strToArr(char* S, int* arr, int len)
+void strToArr(char* S, int* arr)
 {
     int c,i,j,l,k;
     char q;
@@ -349,7 +348,6 @@ void bubbleSort(struct Node** head, int count)
             break;
     }
 }
-
 //Реверс элементов между первым и последним вхождение элемента E
 Node* reverseBetweenFirstAndLast(Node* head, int e) {
     if (!head)return;;
@@ -426,13 +424,187 @@ Node* reverseBetweenFirstAndLast(Node* head, int e) {
 
 
 }
-
-
-
-
 #pragma endregion
-#pragma region Меню
 
+#pragma region Реализация очереди и работа с ней
+//Структура очереди
+typedef struct Queue {
+    Node *frnt,*rear;
+}Queue;
+//Инициализация очереди
+Queue *init() {
+    Queue *q = (Queue*)malloc(sizeof(Queue*));
+    q->frnt = NULL;
+    q->rear = NULL;
+    return q;
+}
+//Проверка пуста ли очередь
+int isEmpty(Queue *q) {
+    if(q->frnt != NULL) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+//Удаление всей очереди
+void delete(Queue *q)
+{
+    Node *temp;
+    if(isEmpty(q)==1) {
+        printf("Очередь пуста!\n");
+        return;
+    }
+    temp = q->frnt;
+    q->frnt = q->frnt->next;
+    free(temp);
+    if (q->frnt!= NULL) {
+        delete(q);
+    }
+}
+//Удаление элемента очереди
+void deleteNthElmQueue(Queue *q,int value)
+{
+    Node *curr,*prev;
+    if(isEmpty(q)==1) {
+        printf("Queue is NULL!\n");
+        return;
+    }
+    for(curr = q->frnt; curr!= NULL; curr=curr->next) {
+
+        if (curr->value != value) {
+            prev = curr;
+        }else {
+            if (curr == q->frnt) {
+                prev = curr;
+                (*curr) = (*prev->next);return;
+            }else {
+                if (curr->next != NULL) {
+                    prev->next = curr->next;
+                    return;
+                }else {
+                    prev->next = NULL;
+                    (*curr) = (*prev);
+                    return;
+                }
+            }
+
+        }
+
+    }
+}
+//Посмотреть и удалить
+int popQueue(Queue *q) {
+    Node*temp;
+    int x;
+    if(isEmpty(q)==1) {
+        printf("Queue is NULL!\n");
+        return 0;
+    }
+    x = q->frnt->value;
+    temp = q->frnt;
+    q->frnt = q->frnt->next;
+    free(temp);
+    return x;
+}
+//Посмотреть и удалить элемент
+int popQueueNth(Queue *q, int value) {
+    Node *curr,*prev;
+    int x;
+    if(isEmpty(q)==1) {
+        printf("Queue is NULL!\n");
+        return 0;
+    }
+    for(curr = q->frnt; curr!= NULL; curr=curr->next) {
+
+        if (curr->value != value) {
+            prev = curr;
+        }else {
+            if (curr == q->frnt) {
+                prev = curr;
+                (*curr) = (*prev->next);return curr->value;
+            }else {
+                if (curr->next != NULL) {
+                    prev->next = curr->next;
+                    return curr->value;
+                }else {
+                    prev->next = NULL;
+                    (*curr) = (*prev);
+                    return curr->value;
+                }
+            }
+
+        }
+
+    }
+}
+//Функция добавления элемента в очередь
+void insertToQueue(Queue *q, int elm)
+{
+    Node *tmp;
+    tmp = (Node*)malloc(sizeof(Node*));
+    tmp->next = NULL;
+    tmp->value = elm;
+    if(q->rear != NULL)
+        q->rear->next = tmp;
+    else {
+        q->frnt = tmp;
+    }
+q->rear = tmp;
+}
+//Сформировать очередь
+void createQueue(Queue *q,int* elms, int len) {
+    for (size_t i = 0; i < len;i++) {
+        insertToQueue(q,elms[i]);
+    }
+}
+//Вывод всех элементов очереди
+void printQueue(Queue* q) {
+    Node *h;
+    if(isEmpty(q)==1) {
+        printf("Queue is Null!\n");
+        return;
+    }
+    for(h = q->frnt; h!= NULL; h=h->next)
+        printf("%d ",h->value);
+}
+//Поиск элемента очереди
+void searchElmInQueue(Queue *q,int val) {
+    if (q->frnt == 0) {
+        printf("Queue is NULL");
+    }else {
+        Node *h;
+        for(h = q->frnt; h!= NULL; h=h->next){
+            if (h->value == val) {
+                printf("This element is present in queue");
+                return;
+            }
+        }
+
+    }
+}
+//Количество элементов с одинаковыми соседями
+int countElementsWithSameNeighbours(Queue* queue) {
+    int count = 0;
+    Node* current = queue->frnt;
+    Node* previous = NULL;
+    Node* next = NULL;
+
+    while (current != NULL) {
+        next = current->next;
+
+            if (previous != NULL && next != NULL && current->value == previous->value && current->value == next->value)
+            count++;
+
+        previous = current;
+        current = next;
+    }
+
+    return count;
+}
+#pragma endregion
+
+#pragma region Меню
 
 void menuList(Node *head,int val){
     printf(
@@ -449,11 +621,13 @@ void menuList(Node *head,int val){
                    "\n"
                    "\t\t  5  Removal"
                    "\n"
-                   "\t\t  6 Take a list item"
+                   "\t\t  6  Take a list item"
                    "\n"
-                   "\t\t  7 Viewing list items"
+                   "\t\t  7  Viewing list items"
                    "\n"
-                   "\t\t  8 Reverse list on first E to last E"
+                   "\t\t  8  Reverse list on first E to last E"
+                   "\n"
+                   "\t\t  9  Exit in grand menu"
                    "\n"
            "_______________________________________________________"
                    "\n"
@@ -480,7 +654,7 @@ void menuList(Node *head,int val){
                             head = NULL;
                             int len = lenIntMass(&str);
                             int array[len];
-                            strToArr(&str,&array,len);
+                            strToArr(&str,&array);
                             fromArray(&head,array,len);
                             bubbleSort(&head,len);
                             Node *tmp = head;
@@ -497,7 +671,7 @@ void menuList(Node *head,int val){
                             head = NULL;
                             int len = lenIntMass(&str);
                             int array[len];
-                            strToArr(&str,&array,len);
+                            strToArr(&str,&array);
                             fromArray(&head,array,len);
                             printLinkedList(head);
                             break;;
@@ -712,20 +886,195 @@ void menuList(Node *head,int val){
                     head = reverseBetweenFirstAndLast(head,value);
                     break;
         }
-        default:break;
+        case 9: {
+            return;
+        }
+        default: {
+            exit(-1);
+        }
             }
     val = 0;
     menuList(head,val);
     }
 
+void menuQueue(Node *head,Queue *q, int val) {
+    printf(
+    "\n "
+           "_______________________________________________________"
+           "\n"
+           "\t\t  1  Check if the queue is empty"
+           "\n"
+           "\t\t  2  Creating a queue"
+           "\n"
+           "\t\t  3  Searching for a queue item"
+           "\n"
+           "\t\t  4  Adding a queue item"
+           "\n"
+           "\t\t  5  Deleting"
+           "\n"
+           "\t\t  6  Take a queue item"
+           "\n"
+           "\t\t  7  Viewing queue items"
+           "\n"
+           "\t\t  8  Defines the number of elements that have the same neighbors"
+           "\n"
+           "\t\t  9  Exit in grand menu"
+           "\n"
+   "_______________________________________________________"
+           "\n"
+               );
+    scanf("%d",&val);
+    switch (val) {
+        case 1: {
+            if (isEmpty(q) == 1) {
+                printf("Queue is NULL\n");
+            }else {
+                printf("Queue is not NULL\n");
+            }
+            break;
+        }
+        case 2: {
+            char str[1024];
 
+            printf("\t\t  input elements through (,)\n");
+            getchar();
+            fgets(&str,1024,stdin);
 
-#pragma endregion
+            int len = lenIntMass(&str);
+            int array[len];
 
-int main() {
-    //Опусташаем список
-    Node *head = NULL;
+            strToArr(&str,&array);
+            createQueue(q,array,len);
+            printQueue(q);
+            break;
+        }
+        case 3: {
+            int value = 0;
+            char str[10];
+            printf("Insert value is search in queue\n");
+            scanf("%s",str);
+            value = strtol(str,NULL,10);
+            searchElmInQueue(q,value);
+            break;
+        }
+        case 4: {
 
+            char str[10];
+            printf("Insert adding value\n");
+            int newValue = 0;
+
+            getchar();
+            scanf("%s",&str);
+            newValue = strtol(str,NULL,10);
+            insertToQueue(q,newValue);
+            printQueue(q);
+            break;
+        }
+        case 5: {
+            printf(
+                "\n "
+                       "_______________________________________________________"
+                       "\n"
+                       "\t\t  1  Delete element queue"
+                       "\n"
+                       "\t\t  2  Delete all queue"
+                       "\n"
+               "_______________________________________________________"
+                       "\n"
+                           );
+            scanf("%d",&val);
+            switch (val) {
+                case 1: {
+                    int value = 0;
+                    char str[10];
+                    printf("Insert delete value\n");
+                    getchar();
+                    scanf("%s",str);
+                    value = strtol(str,NULL,10);
+                    deleteNthElmQueue(q,value);
+                    break;
+                }
+                case 2:{
+                delete(q);
+                break;
+                }
+            }
+            break;
+        }
+        case 6: { printf(
+                "\n "
+                       "_______________________________________________________"
+                       "\n"
+                       "\t\t  1  Output element queue"
+                       "\n"
+                       "\t\t  2  Output all queue"
+                       "\n"
+               "_______________________________________________________"
+                       "\n"
+                           );
+            scanf("%d",&val);
+            switch (val) {
+                case 1: {
+                    int value = 0;
+                    char str[10];
+                    printf("Insert value for output\n");
+                    getchar();
+                    scanf("%s",str);
+                    value = strtol(str,NULL,10);
+                    popQueueNth(q,value);
+                    break;
+                }
+                case 2: {
+                    while (q->frnt != NULL) {
+                        printf("%d ",popQueue(q));
+                    };break;
+                }
+            }
+
+        }
+        case 7: {printf(
+                "\n "
+                       "_______________________________________________________"
+                       "\n"
+                       "\t\t  1  Print First"
+                       "\n"
+                       "\t\t  2  Print Rear"
+                       "\n"
+                       "\t\t  2  Print all"
+                       "\n"
+               "_______________________________________________________"
+                       "\n"
+                           );
+                scanf("%d",&val);
+                switch (val) {
+                    case 1: {
+                        printf("%d \n",q->frnt->value);
+                        break;
+                    }
+                    case 2: {
+                        printf("%d \n",q->rear->value);
+                        break;
+                    }
+                    case 3: {
+                        printQueue(q);
+                        break;;
+                    }
+                }
+
+            break;
+        }
+        case 8: {
+            printf("%d",countElementsWithSameNeighbours(q));
+            break;
+        }
+        case 9:{break;}
+        default:{exit(-1);}
+    }
+
+    menuQueue(head,q,val);
+}
+
+void grandMenu(Node *head,Queue *q) {
     int val = 0;
     printf(
         "\n"
@@ -737,21 +1086,33 @@ int main() {
            "\n"
            "\t\t  1   Work with list"
            "\n"
-           "\t\t  2   Work with stack"
+           "\t\t  2   Work with queue"
            "\n"
-           "\t\t  3   Work with queue"
+           "\t\t  3   Work with stack"
+           "\n"
+           "\t\t  0   Exit"
            "\n"
            "_______________________________________________________"
            "\n"
            );
     scanf("%d",&val);
     switch (val) {
-        case 1: {
-            menuList(head,val);
-            }
-        case 2: printf("stack");break;
-        case 3: printf("queue");break;
+        case 1: {menuList(head,val);break;}
+        case 2: {menuQueue(head,q,val);break;}
+        case 3: printf("stack");break;
+        case 9: {exit(0);}
+        default:{exit(-1);}
     }
+    grandMenu(head,q);
+}
+
+#pragma endregion
+
+int main() {
+    //Опусташаем список
+    Node *head = NULL;
+    Queue *q = init();
+    grandMenu(head,q);
 }
 
 
